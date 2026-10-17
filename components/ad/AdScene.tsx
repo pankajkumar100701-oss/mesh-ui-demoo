@@ -346,6 +346,21 @@ function Gallery() {
       t.needsUpdate = true;
     });
   }, [textures]);
+  // Border glow per card: the more saturated of the two brand colours, lightness capped, so pale brands
+  // (e.g. an off-white) glow in colour instead of blowing out to white under bloom.
+  const borders = useMemo(
+    () =>
+      sites.map((s) => {
+        const [c, hsl] = s.colors
+          .map((hex) => {
+            const col = new THREE.Color(hex);
+            return [col, col.getHSL({ h: 0, s: 0, l: 0 })] as const;
+          })
+          .reduce((a, b) => (b[1].s > a[1].s ? b : a));
+        return c.setHSL(hsl.h, hsl.s, Math.min(hsl.l, 0.55)).multiplyScalar(1.6);
+      }),
+    [],
+  );
   const step = (Math.PI * 2) / sites.length;
   const scatter = useMemo(() => {
     const rnd = createRandom(3);
@@ -379,7 +394,7 @@ function Gallery() {
         <group key={site.slug} ref={(g) => void (cards.current[i] = g)}>
           <mesh position-z={-0.02}>
             <planeGeometry args={[CARD_W + 0.14, CARD_H + 0.14]} />
-            <meshBasicMaterial color={new THREE.Color(site.colors[0]).multiplyScalar(1.8)} toneMapped={false} />
+            <meshBasicMaterial color={borders[i]} toneMapped={false} />
           </mesh>
           <mesh>
             <planeGeometry args={[CARD_W, CARD_H]} />
@@ -468,8 +483,9 @@ const KEYS: Key[] = [
   { t: 11.6, pos: [0, 3.4, 7.6], look: [-1.8, STAGE_Y, 0] },
   { t: 12.6, pos: [0, 3.1, RING + 7.6], look: [0, STAGE_Y - 0.1, RING] },
   { t: 21.6, pos: [0, 3.1, RING + 7.4], look: [0, STAGE_Y - 0.1, RING] },
-  { t: 22.6, pos: [-6.5, 2.4, 8], look: [0, 0, 0] },
-  { t: 26.2, pos: [5.5, 3.2, 8.5], look: [0, 0.2, 0] },
+  // Kept high and back: the splashes in this beat throw tall pillars that would otherwise fill the lens.
+  { t: 22.6, pos: [-6.5, 4.6, 10.5], look: [0, 0, 0] },
+  { t: 26.2, pos: [5.5, 4.8, 10.8], look: [0, 0.2, 0] },
   { t: 27.4, pos: [0, 3.6, 9.4], look: [0, STAGE_Y - 0.2, 0] },
   { t: 30, pos: [0, 3.5, 8.8], look: [0, STAGE_Y - 0.2, 0] },
 ];

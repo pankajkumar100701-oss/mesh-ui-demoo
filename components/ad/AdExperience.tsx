@@ -42,6 +42,8 @@ export default function AdExperience() {
   const phaseRef = useRef<Phase>("idle");
   const [card, setCard] = useState(0);
   const [showReplay, setShowReplay] = useState(false);
+  // Once the viewer scrolls to preview, the start panel shrinks into a corner so it doesn't cover the copy.
+  const [scrubbed, setScrubbed] = useState(false);
   const target = useRef(0);
   const wentFullscreen = useRef(false);
   const startedAt = useRef(0);
@@ -59,6 +61,7 @@ export default function AdExperience() {
     const onScroll = () => {
       if (phaseRef.current === "playing" || phaseRef.current === "arming") return;
       target.current = (window.scrollY / Math.max(1, maxScroll())) * DURATION;
+      setScrubbed(target.current > 0.3);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -70,7 +73,8 @@ export default function AdExperience() {
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
       if (phaseRef.current === "playing") {
-        const t = Math.min(DURATION, (now - startedAt.current) / 1000);
+        // rAF's timestamp can be slightly older than startedAt, so clamp at 0 too.
+        const t = Math.min(DURATION, Math.max(0, (now - startedAt.current) / 1000));
         timeline.t = t;
         target.current = t;
         window.scrollTo(0, (t / DURATION) * maxScroll());
@@ -94,6 +98,7 @@ export default function AdExperience() {
   const stop = useCallback(() => {
     if (phaseRef.current !== "playing" && phaseRef.current !== "arming") return;
     document.documentElement.classList.remove("ad-playing");
+    setScrubbed(timeline.t > 0.3);
     go("idle");
   }, [go]);
 
@@ -322,7 +327,17 @@ export default function AdExperience() {
       {/* Scroll track: 30 seconds of scroll. Also scrubbable by hand to preview any moment. */}
       <div style={{ height: `${DURATION * 40}vh` }} />
 
-      {(phase === "idle" || (phase === "done" && showReplay)) && (
+      {phase === "idle" && scrubbed && (
+        <button
+          onClick={start}
+          className="fixed right-4 top-4 z-20 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black shadow-[0_0_40px_rgba(139,92,246,0.5)] transition-transform hover:scale-105"
+        >
+          <span className="grid h-5 w-5 place-items-center rounded-full bg-black text-[10px] text-white">▶</span>
+          Start 30s ad
+        </button>
+      )}
+
+      {((phase === "idle" && !scrubbed) || (phase === "done" && showReplay)) && (
         <div className="fixed inset-x-0 bottom-8 z-20 grid place-items-center px-4">
           <div className="rounded-3xl border border-white/10 bg-black/60 px-6 py-5 text-center backdrop-blur-md">
             <button
