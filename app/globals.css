@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+:root {
+  --background: #07070a;
+  --foreground: #ededf0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Ad recorder page (/ad): no scrollbar, no cursor while it plays. */
+html.ad-mode {
+  scrollbar-width: none;
+}
+html.ad-mode::-webkit-scrollbar {
+  display: none;
+}
+/* Keeps the Next.js dev badge out of the recording. */
+html.ad-mode nextjs-portal {
+  display: none;
+}
+html.ad-playing,
+html.ad-playing * {
+  cursor: none !important;
+}
+.ad-swap {
+  animation: ad-swap 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes ad-swap {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+}
+.ad-caret {
+  animation: ad-blink 1s steps(1) infinite;
+}
+@keyframes ad-blink {
+  50% {
+    opacity: 0;
+  }
+}
