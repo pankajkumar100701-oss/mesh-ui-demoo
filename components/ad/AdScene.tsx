@@ -330,7 +330,8 @@ function Glass() {
 /* Beat: Gallery — the ten sites on a turning carousel                 */
 /* ------------------------------------------------------------------ */
 
-const RING = 7;
+// Wide enough that neighbouring cards (36° apart) never intersect.
+const RING = 8.8;
 const CARD_W = 4.8;
 const CARD_H = 2.7;
 

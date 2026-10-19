@@ -39,5 +39,6 @@ export function galleryIndex(t: number, count: number) {
   const i = Math.floor(u);
   // Hold each card for most of its slot, then swing to the next.
   const turn = smooth((u - i - 0.6) / 0.4);
-  return { index: Math.min(i, count - 1), position: Math.min(i + turn, count - 1) };
+  // The caption follows whichever card is nearer the front, so it switches mid-turn rather than after it.
+  return { index: Math.min(Math.round(i + turn), count - 1), position: Math.min(i + turn, count - 1) };
 }

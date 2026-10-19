@@ -233,10 +233,10 @@ export default function AdExperience() {
             data-to={BEATS.gallery[1] - 0.2}
             className="text-[clamp(2rem,4.6vw,4.5rem)] font-semibold tracking-tight"
           >
+            Whole websites,{" "}
             <span className="bg-gradient-to-r from-violet-400 via-fuchsia-300 to-cyan-300 bg-clip-text text-transparent">
-              {sites.length}
-            </span>{" "}
-            complete 3D websites
+              built in 3D
+            </span>
           </h2>
         </div>
         <div
